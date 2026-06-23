@@ -16,6 +16,7 @@
     border-gray-200
     hover:bg-gray-700
     hover:text-white
+    focus:bg-gray-700
     w-full h-auto
     p-3
   "
