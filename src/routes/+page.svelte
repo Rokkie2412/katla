@@ -1,5 +1,5 @@
 <script>
-  import Button from '../ui/button.svelte'
+  import Button from '../ui/button.svelte';
 </script>
 
 <div class="w-full h-dvh flex flex-col justify-between">

@@ -47,6 +47,7 @@
 		"svelte"
 	],
 	"dependencies": {
-		"daisyui": "^5.5.23"
+		"daisyui": "^5.5.23",
+		"svelte-sonner": "^1.1.1"
 	}
 }
