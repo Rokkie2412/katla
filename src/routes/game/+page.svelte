@@ -1,89 +1,113 @@
 <script lang="ts">
-  import { Toaster, toast } from 'svelte-sonner';
-  import id from './id.json' with { type: 'json' };
+  import { onMount } from "svelte";
+  import { Toaster, toast } from "svelte-sonner";
+  import {
+    checkItemColors,
+    getWord,
+    onHandleInput,
+    setStyleClassInput,
+  } from "../../utils/index.ts";
+  import id from "../game/id.json" with { type: "json" };
+  import { katlaStates } from "../states.svelte.ts";
 
-  const getWord = () => {
-    const randomIndex = Math.floor(Math.random() * id.length);
-    const randomWord = id[randomIndex];
-    return randomWord.toUpperCase().split('');
-  }
+  let guess = katlaStates.guessId;
+  let inputs: HTMLInputElement[][] = [[], [], [], [], [], []];
+  let activeIndex = $state(0);
+  let word = getWord();
 
-  const regexOnlyAlphabeth = /^[a-zA-Z]+$/;
-	let guess = $state([
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', '']
-	]);
+  onMount(() => {
+    inputs[activeIndex][0]?.focus();
+  });
 
-	let inputs: HTMLInputElement[][] = [
-    [], [], [], [], [], []
-  ];
-  let activeIndex = $state(0)
-  
-  const onCompleteRow = (currentIndex: number) => {
-    if(guess[activeIndex].includes('')) {
-      toast.error('Please fill all the words')
-      return
+  const refocus = () => {
+    if (activeIndex > 5) return;
+
+    let targetIndex = guess[activeIndex].findIndex((letter) => letter === "");
+
+    if (targetIndex === -1) {
+      targetIndex = 4;
     }
+
+    inputs[activeIndex][targetIndex]?.focus();
+  };
+
+  const onCompleteRow = () => {
+    if (guess[activeIndex].includes("")) {
+      toast.error("Please fill all the words in the row", { duration: 1000 });
+      return;
+    }
+
+    const status = ["gray", "gray", "gray", "gray", "gray"];
+    let currentGuess = guess[activeIndex];
+    let availableTargetLetters = [...word];
+
+    if (!id.includes(currentGuess.join("").toLowerCase())) {
+      toast.error(
+        `"${currentGuess.join("").toUpperCase()}" is not a valid word`,
+        { duration: 1000 },
+      );
+      return;
+    }
+
+    checkItemColors(currentGuess, availableTargetLetters, status);
+    setStyleClassInput(status, activeIndex, inputs);
 
     if (activeIndex < 5) {
-      activeIndex += 1;
-      
       setTimeout(() => {
-        inputs[activeIndex][0]?.focus();
-      }, 0);
+        activeIndex += 1;
+        setTimeout(() => {
+          inputs[activeIndex][0]?.focus();
+        }, 0);
+      }, 1800);
+    } else {
+      setTimeout(() => {
+        toast.error("You failed to guess the word!", { duration: 1000 });
+      }, 1800);
     }
-  }
+  };
 
-  const onHandleChange = (currentIndex: number) => () => {
-    guess[activeIndex][currentIndex] = guess[activeIndex][currentIndex].toUpperCase();
-
-    if(!regexOnlyAlphabeth.test(guess[activeIndex][currentIndex])) {
-      guess[activeIndex][currentIndex] = ''
-    }
-
-    if (currentIndex < 4 && guess[activeIndex][currentIndex] !== '') {
-      inputs[activeIndex][currentIndex + 1]?.focus();
-    }
-  }
-
-  const onKeydownPress = (currentIndex: number) => (event: { key: string; }) => {
-    if (event.key === 'Backspace') {
-      if (currentIndex > 0 && guess[activeIndex][currentIndex] === '') {
+  const onKeydownPress = (currentIndex: number) => (event: { key: string }) => {
+    if (event.key === "Backspace") {
+      if (currentIndex > 0 && guess[activeIndex][currentIndex] === "") {
         inputs[activeIndex][currentIndex - 1]?.focus();
       }
-      return
+      return;
     }
-    if (event.key === 'Enter') {
-      console.log('enter');
-      onCompleteRow(currentIndex);
+    if (event.key === "Enter") {
+      onCompleteRow();
+      return;
     }
-  }
+  };
 </script>
 
+<svelte:window onclick={refocus} />
 
-<main class="flex flex-col items-center h-dvh gap-3 text-center ">
+<main class="flex flex-col items-center h-dvh gap-3 text-center">
   <div class="flex flex-col gap-2">
-      {#each guess as row, i}
-        <div class="flex flex-row justify-center items-center gap-2">
-          {#each row as words, index}
-            <input
-              disabled={activeIndex !== i}
-              bind:this={inputs[i][index]}
-              bind:value={guess[i][index]}
-              type="text"
-              maxlength="1"
-              oninput={onHandleChange(index)}
-              onkeydown={onKeydownPress(index)}
-              class="border-2 w-15 h-15 text-3xl text-center"
-              placeholder=""
-            />
-          {/each}
-        </div>
-      {/each}
+    {#each guess as row, i}
+      <div class="flex flex-row justify-center items-center gap-2">
+        {#each row, index}
+          <input
+            disabled={activeIndex !== i}
+            bind:this={inputs[i][index]}
+            bind:value={guess[i][index]}
+            type="text"
+            maxlength="1"
+            onmousedown={(e) => e.preventDefault()}
+            oninput={onHandleInput(index, guess, activeIndex, inputs)}
+            onkeydown={onKeydownPress(index)}
+            class="border-2 rounded-none! w-15 h-15 text-3xl text-center caret-transparent cursor-default focus:rounded-none! focus:outline-none focus:ring-0"
+            placeholder=""
+          />
+        {/each}
+      </div>
+    {/each}
   </div>
-  <Toaster position="top-center" richColors closeButton visibleToasts={3} duration={1000} />
+  <Toaster
+    position="top-center"
+    richColors
+    closeButton
+    visibleToasts={3}
+    duration={1000}
+  />
 </main>
