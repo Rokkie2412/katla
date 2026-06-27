@@ -6,6 +6,8 @@
     getWord,
     onHandleInput,
     setStyleClassInput,
+    refocus,
+    initializeUserId,
   } from "../../utils/index.ts";
   import id from "../game/id.json" with { type: "json" };
   import { katlaStates } from "../states.svelte.ts";
@@ -17,19 +19,8 @@
 
   onMount(() => {
     inputs[activeIndex][0]?.focus();
+    initializeUserId();
   });
-
-  const refocus = () => {
-    if (activeIndex > 5) return;
-
-    let targetIndex = guess[activeIndex].findIndex((letter) => letter === "");
-
-    if (targetIndex === -1) {
-      targetIndex = 4;
-    }
-
-    inputs[activeIndex][targetIndex]?.focus();
-  };
 
   const onCompleteRow = () => {
     if (guess[activeIndex].includes("")) {
@@ -80,7 +71,7 @@
   };
 </script>
 
-<svelte:window onclick={refocus} />
+<svelte:window onclick={refocus(activeIndex, guess, inputs)} />
 
 <main class="flex flex-col items-center h-dvh gap-3 text-center">
   <div class="flex flex-col gap-2">
