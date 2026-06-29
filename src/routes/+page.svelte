@@ -23,8 +23,16 @@
       Each guess must be a valid 5 letter word. Hit the enter button to submit
     </p>
     <div class="flex gap-2.5 flex-row mt-2 w-1/4 md:w-1/7 justify-center">
-      <Button label="English" />
-      <Button label="Indonesian" />
+      <Button
+        image="https://flagcdn.com/w40/gb.png"
+        label="English"
+        href="/game/en"
+      />
+      <Button
+        image="https://flagcdn.com/w40/id.png"
+        label="Indonesian"
+        href="game/id"
+      />
     </div>
   </main>
   <footer
