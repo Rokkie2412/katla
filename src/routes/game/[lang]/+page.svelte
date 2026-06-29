@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Toaster, toast } from "svelte-sonner";
   import { keyboardRows } from "../../../config/index.ts";
+  import Key from "../../../ui/keyboardKey.svelte";
   import {
     checkItemColors,
     generateUUID,
@@ -11,7 +12,6 @@
     useStorable,
   } from "../../../utils/index.svelte.ts";
   import id from "../../game/id.json" with { type: "json" };
-  import Key from "../../../ui/keyboardKey.svelte";
 
   const gameStore = useStorable("katla_user_id", {
     id: generateUUID(),
@@ -48,17 +48,11 @@
 
     if (
       !id.includes(
-        currentGuess
-          .map((item) => item.letter)
-          .join("")
-          .toLowerCase(),
+        currentGuess.map((item) => item.letter).join("").toLowerCase(),
       )
     ) {
       toast.error(
-        `"${currentGuess
-          .map((item) => item.letter)
-          .join("")
-          .toUpperCase()}" is not a valid word`,
+        `"${currentGuess.map((item) => item.letter).join("").toUpperCase()}" is not a valid word`,
         { duration: 1000 },
       );
       return;
@@ -99,17 +93,11 @@
 
 <main class="flex flex-col items-center h-dvh gap-3 text-center w-full">
   <div class="flex flex-col gap-2 h-dvh w-full justify-between items-center">
-    <header
-      class="flex flex-col items-center justify-center w-1/2 px-4 py-4 border-b-2 border-gray-200 dark:border-gray-700"
-    >
-      <h1
-        class="text-3xl md:text-5xl font-extrabold tracking-widest text-gray-900 dark:text-white"
-      >
+    <header class="flex flex-col items-center justify-center w-1/2 px-4 py-4 border-b-2 border-gray-200 dark:border-gray-700">
+      <h1 class="text-3xl md:text-5xl font-extrabold tracking-widest text-gray-900 dark:text-white">
         WORDLE
       </h1>
-      <div
-        class="flex items-center gap-4 mt-2 text-sm md:text-base font-semibold text-gray-600 dark:text-gray-300"
-      >
+      <div class="flex items-center gap-4 mt-2 text-sm md:text-base font-semibold text-gray-600 dark:text-gray-300">
         <button
           class="flex items-center gap-1.5 hover:text-black dark:hover:text-white transition-colors border-b-2 border-transparent hover:border-black dark:hover:border-white pb-0.5"
         >
@@ -137,9 +125,7 @@
               onmousedown={(e) => e.preventDefault()}
               oninput={onHandleInput(index, guess, activeIndex, inputs)}
               onkeydown={onKeydownPress(index)}
-              class="
-              border-2 rounded-none! w-15 h-15 text-3xl text-center caret-transparent cursor-default focus:rounded-none! focus:outline-none focus:ring-0 md:w-18 md:h-18
-              "
+              class="border-2 rounded-none! w-15 h-15 text-3xl text-center caret-transparent cursor-default focus:rounded-none! focus:outline-none focus:ring-0 md:w-18 md:h-18"
               placeholder=""
             />
           {/each}
