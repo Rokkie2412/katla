@@ -38,6 +38,8 @@
   hover:opacity-80
   active:scale-95
   active:translate-y-1
+  short:w-9.5
+  short:h-11
   ${letter === "" ? "invisible" : ""}
   ${sizeClass}
   ${statusClass}`}

@@ -3,3 +3,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @config "../../tailwind.config.js";
+
+@custom-variant short (@media (max-height: 650px));
+@custom-variant tall (@media (min-height: 900px));

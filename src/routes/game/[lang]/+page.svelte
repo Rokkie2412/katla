@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { Toaster, toast } from "svelte-sonner";
   import { keyboardRows } from "../../../config/index.ts";
   import Key from "../../../ui/keyboardKey.svelte";
@@ -121,11 +122,12 @@
               bind:this={inputs[i][index]}
               bind:value={guess[i][index].letter}
               type="text"
+              inputmode="none"
               maxlength="1"
               onmousedown={(e) => e.preventDefault()}
               oninput={onHandleInput(index, guess, activeIndex, inputs)}
               onkeydown={onKeydownPress(index)}
-              class="border-2 rounded-none! w-15 h-15 text-3xl text-center caret-transparent cursor-default focus:rounded-none! focus:outline-none focus:ring-0 md:w-18 md:h-18"
+              class={`border-2 rounded-none! w-15 h-15 text-3xl text-center caret-transparent cursor-default focus:rounded-none! focus:outline-none focus:ring-0 short:w-12 short:h-12`}
               placeholder=""
             />
           {/each}
@@ -133,7 +135,7 @@
       {/each}
     </div>
 
-    <div class="flex w-full h-auto justify-center items-center mb-4">
+    <div class="flex w-full h-auto justify-center items-center mb-4 short:mb-0">
       <div class="w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
         {#each keyboardRows as keyRow, index}
           <div class="flex flex-row justify-center items-center gap-1 m-1">
