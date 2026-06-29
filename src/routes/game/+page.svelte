@@ -1,47 +1,55 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { Toaster, toast } from "svelte-sonner";
   import {
-    checkItemColors,
-    getWord,
-    onHandleInput,
-    setStyleClassInput,
-    refocus,
-    initializeUserId,
-  } from "../../utils/index.ts";
+      checkItemColors,
+      generateUUID,
+      getWord,
+      onHandleInput,
+      refocus,
+      setStyleClassInput,
+      useStorable
+  } from "../../utils/index.svelte.ts";
   import id from "../game/id.json" with { type: "json" };
-  import { katlaStates } from "../states.svelte.ts";
 
-  let guess = katlaStates.guessId;
-  let inputs: HTMLInputElement[][] = [[], [], [], [], [], []];
-  let activeIndex = $state(0);
-  let word = getWord();
-
-  onMount(() => {
-    inputs[activeIndex][0]?.focus();
-    initializeUserId();
+  const gameStore = useStorable("katla_user_id", {
+    id: generateUUID(),
+    score: 0,
+    winStreak: 0,
+    activeIndex: 0,
+    activeWord: [],
+    grid: Array(6).fill(null).map(() => 
+      Array(5).fill(null).map(() => ({ 
+        letter: '', 
+        status: 'idle'
+      }))
+    )
   });
 
+  let guess = gameStore.value.grid!;
+
+  let inputs: HTMLInputElement[][] = [[], [], [], [], [], []];
+  let activeIndex = $state(gameStore.value.activeIndex!);
+  gameStore.value.activeWord = getWord();
+
   const onCompleteRow = () => {
-    if (guess[activeIndex].includes("")) {
+    if (guess[activeIndex].some(cell => cell.letter === "")) {
       toast.error("Please fill all the words in the row", { duration: 1000 });
       return;
     }
 
-    const status = ["gray", "gray", "gray", "gray", "gray"];
     let currentGuess = guess[activeIndex];
-    let availableTargetLetters = [...word];
+    let availableTargetLetters = [...gameStore.value.activeWord];
 
-    if (!id.includes(currentGuess.join("").toLowerCase())) {
+    if (!id.includes(currentGuess.map(item => item.letter).join("").toLowerCase())) {
       toast.error(
-        `"${currentGuess.join("").toUpperCase()}" is not a valid word`,
+        `"${currentGuess.map(item => item.letter).join("").toUpperCase()}" is not a valid word`,
         { duration: 1000 },
       );
       return;
     }
 
-    checkItemColors(currentGuess, availableTargetLetters, status);
-    setStyleClassInput(status, activeIndex, inputs);
+    checkItemColors(currentGuess, availableTargetLetters, guess[activeIndex]);
+    setStyleClassInput(guess[activeIndex], activeIndex, inputs);
 
     if (activeIndex < 5) {
       setTimeout(() => {
@@ -59,7 +67,7 @@
 
   const onKeydownPress = (currentIndex: number) => (event: { key: string }) => {
     if (event.key === "Backspace") {
-      if (currentIndex > 0 && guess[activeIndex][currentIndex] === "") {
+      if (currentIndex > 0 && guess[activeIndex][currentIndex].letter === "") {
         inputs[activeIndex][currentIndex - 1]?.focus();
       }
       return;
@@ -81,7 +89,7 @@
           <input
             disabled={activeIndex !== i}
             bind:this={inputs[i][index]}
-            bind:value={guess[i][index]}
+            bind:value={guess[i][index].letter}
             type="text"
             maxlength="1"
             onmousedown={(e) => e.preventDefault()}
