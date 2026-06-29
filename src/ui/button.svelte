@@ -1,14 +1,14 @@
 <script lang="ts">
   type Props = {
-    label: string,
-    onClick?: () => void,
-  }
+    label: string;
+    onClick?: () => void;
+  };
 
   const props: Props = $props();
 </script>
 
-<button 
-  onclick={props.onClick} 
+<button
+  onclick={props.onClick}
   class="
     btn
     btn-outline
@@ -19,6 +19,6 @@
     w-full h-auto
     p-3
   "
-  >
+>
   {props.label}
 </button>

@@ -1,25 +1,12 @@
 import id from "../routes/game/id.json" with { type: "json" };
+import type { LocalStorageItem, gridItem } from "../types/index.ts";
 
 const regexOnlyAlphabeth = /^[a-zA-Z]+$/;
-
-interface gridItem {
-  letter: string;
-  status: 'idle' | 'gray' | 'yellow' | 'green';
-}
-
-export interface LocalStorageItem {
-  id: string;
-  score: number;
-  winStreak: number;
-  activeIndex: number;
-  grid: gridItem[][];
-  activeWord: string[];
-}
 
 export function useStorable(key: string, initialValue: LocalStorageItem) {
   let data = $state<LocalStorageItem>(initialValue);
 
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const stored = localStorage.getItem(key);
     if (stored) {
       data = JSON.parse(stored);
@@ -27,14 +14,18 @@ export function useStorable(key: string, initialValue: LocalStorageItem) {
   }
 
   $effect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(key, JSON.stringify(data));
     }
   });
 
   return {
-    get value() { return data; },
-    set value(newValue: LocalStorageItem) { data = newValue; }
+    get value() {
+      return data;
+    },
+    set value(newValue: LocalStorageItem) {
+      data = newValue;
+    },
   };
 }
 
@@ -46,7 +37,8 @@ export const onHandleInput =
     inputs: HTMLInputElement[][],
   ) =>
   (): void => {
-    guess[activeIndex][currentIndex].letter = guess[activeIndex][currentIndex].letter.toUpperCase();
+    guess[activeIndex][currentIndex].letter =
+      guess[activeIndex][currentIndex].letter.toUpperCase();
 
     if (!regexOnlyAlphabeth.test(guess[activeIndex][currentIndex].letter)) {
       guess[activeIndex][currentIndex].letter = "";
@@ -172,7 +164,9 @@ export const refocus =
   (): void => {
     if (activeIndex > 5) return;
 
-    let targetIndex = guess[activeIndex].findIndex((item) => item.letter === "");
+    let targetIndex = guess[activeIndex].findIndex(
+      (item) => item.letter === "",
+    );
 
     if (targetIndex === -1) {
       targetIndex = 4;
@@ -181,9 +175,6 @@ export const refocus =
     inputs[activeIndex][targetIndex]?.focus();
   };
 
-
 export const getItemLocalStorage = (session?: string): LocalStorageItem => {
-  return JSON.parse(
-    localStorage.getItem("katla_user_id") || "{}",
-  );
-}
+  return JSON.parse(localStorage.getItem("katla_user_id") || "{}");
+};

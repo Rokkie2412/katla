@@ -1,13 +1,13 @@
 <script lang="ts">
   import { Toaster, toast } from "svelte-sonner";
   import {
-      checkItemColors,
-      generateUUID,
-      getWord,
-      onHandleInput,
-      refocus,
-      setStyleClassInput,
-      useStorable
+    checkItemColors,
+    generateUUID,
+    getWord,
+    onHandleInput,
+    refocus,
+    setStyleClassInput,
+    useStorable,
   } from "../../utils/index.svelte.ts";
   import id from "../game/id.json" with { type: "json" };
 
@@ -17,12 +17,16 @@
     winStreak: 0,
     activeIndex: 0,
     activeWord: [],
-    grid: Array(6).fill(null).map(() => 
-      Array(5).fill(null).map(() => ({ 
-        letter: '', 
-        status: 'idle'
-      }))
-    )
+    grid: Array(6)
+      .fill(null)
+      .map(() =>
+        Array(5)
+          .fill(null)
+          .map(() => ({
+            letter: "",
+            status: "idle",
+          })),
+      ),
   });
 
   let guess = gameStore.value.grid!;
@@ -32,7 +36,7 @@
   gameStore.value.activeWord = getWord();
 
   const onCompleteRow = () => {
-    if (guess[activeIndex].some(cell => cell.letter === "")) {
+    if (guess[activeIndex].some((cell) => cell.letter === "")) {
       toast.error("Please fill all the words in the row", { duration: 1000 });
       return;
     }
@@ -40,9 +44,19 @@
     let currentGuess = guess[activeIndex];
     let availableTargetLetters = [...gameStore.value.activeWord];
 
-    if (!id.includes(currentGuess.map(item => item.letter).join("").toLowerCase())) {
+    if (
+      !id.includes(
+        currentGuess
+          .map((item) => item.letter)
+          .join("")
+          .toLowerCase(),
+      )
+    ) {
       toast.error(
-        `"${currentGuess.map(item => item.letter).join("").toUpperCase()}" is not a valid word`,
+        `"${currentGuess
+          .map((item) => item.letter)
+          .join("")
+          .toUpperCase()}" is not a valid word`,
         { duration: 1000 },
       );
       return;
