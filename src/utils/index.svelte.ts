@@ -1,5 +1,5 @@
 import id from "../routes/game/id.json" with { type: "json" };
-import type { LocalStorageItem, gridItem } from "../types/index.ts";
+import type { ColorStatus, LocalStorageItem, gridItem } from "../types/index.ts";
 
 const regexOnlyAlphabeth = /^[a-zA-Z]+$/;
 
@@ -36,18 +36,18 @@ export const onHandleInput =
     activeIndex: number,
     inputs: HTMLInputElement[][],
   ) =>
-  (): void => {
-    guess[activeIndex][currentIndex].letter =
-      guess[activeIndex][currentIndex].letter.toUpperCase();
+    (): void => {
+      guess[activeIndex][currentIndex].letter =
+        guess[activeIndex][currentIndex].letter.toUpperCase();
 
-    if (!regexOnlyAlphabeth.test(guess[activeIndex][currentIndex].letter)) {
-      guess[activeIndex][currentIndex].letter = "";
-    }
+      if (!regexOnlyAlphabeth.test(guess[activeIndex][currentIndex].letter)) {
+        guess[activeIndex][currentIndex].letter = "";
+      }
 
-    if (currentIndex < 4 && guess[activeIndex][currentIndex].letter !== "") {
-      inputs[activeIndex][currentIndex + 1]?.focus();
-    }
-  };
+      if (currentIndex < 4 && guess[activeIndex][currentIndex].letter !== "") {
+        inputs[activeIndex][currentIndex + 1]?.focus();
+      }
+    };
 
 export const getWord = (): string[] => {
   const randomIndex = Math.floor(Math.random() * id.length);
@@ -61,54 +61,35 @@ export const checkItemColors = (
   availableTargetLetters: string[],
   status: gridItem[],
 ) => {
-  currentGuess.forEach((item, index) => {
-    if (item.letter === availableTargetLetters[index]) {
-      status[index].status = "green";
-      availableTargetLetters[index] = "";
+  let evaluatedStatuses = ["notFound", "notFound", "notFound", "notFound", "notFound"];
+
+  let tempTarget = [...availableTargetLetters];
+
+
+  currentGuess.forEach((item, i) => {
+    if (item.letter === tempTarget[i]) {
+      evaluatedStatuses[i] = "green";
+      tempTarget[i] = "";
     }
   });
 
-  currentGuess.forEach((item, index) => {
-    if (status[index].status !== "green") {
-      let foundIndex = availableTargetLetters.indexOf(item.letter);
+  currentGuess.forEach((item, i) => {
+    if (evaluatedStatuses[i] !== "green") {
+      let foundIndex = tempTarget.indexOf(item.letter);
 
       if (foundIndex !== -1) {
-        status[index].status = "yellow";
-        availableTargetLetters[foundIndex] = "";
+        evaluatedStatuses[i] = "yellow";
+        tempTarget[foundIndex] = "";
+      } else {
+        evaluatedStatuses[i] = "notFound";
       }
     }
   });
-};
 
-export const setStyleClassInput = (
-  statues: gridItem[],
-  activeIndex: number,
-  inputs: HTMLInputElement[][],
-) => {
-  statues.forEach((item, index) => {
+  evaluatedStatuses.forEach((resultColor, i) => {
     setTimeout(() => {
-      inputs[activeIndex][index].classList.add("animate-flip");
-
-      if (item.status === "green") {
-        inputs[activeIndex][index].classList.add(
-          "bg-green-500",
-          "text-white",
-          "border-green-500",
-        );
-      } else if (item.status === "yellow") {
-        inputs[activeIndex][index].classList.add(
-          "bg-yellow-500",
-          "text-white",
-          "border-yellow-500",
-        );
-      } else {
-        inputs[activeIndex][index].classList.add(
-          "bg-gray-500",
-          "text-white",
-          "border-gray-500",
-        );
-      }
-    }, index * 300);
+      (status[i].status as ColorStatus) = resultColor as ColorStatus;
+    }, i * 300);
   });
 };
 
@@ -161,19 +142,19 @@ export const initializeUserEn = (): string | null => {
 
 export const refocus =
   (activeIndex: number, guess: gridItem[][], inputs: HTMLInputElement[][]) =>
-  (): void => {
-    if (activeIndex > 5) return;
+    (): void => {
+      if (activeIndex > 5) return;
 
-    let targetIndex = guess[activeIndex].findIndex(
-      (item) => item.letter === "",
-    );
+      let targetIndex = guess[activeIndex].findIndex(
+        (item) => item.letter === "",
+      );
 
-    if (targetIndex === -1) {
-      targetIndex = 4;
-    }
+      if (targetIndex === -1) {
+        targetIndex = 4;
+      }
 
-    inputs[activeIndex][targetIndex]?.focus();
-  };
+      inputs[activeIndex][targetIndex]?.focus();
+    };
 
 export const getItemLocalStorage = (session?: string): LocalStorageItem => {
   return JSON.parse(localStorage.getItem("katla_user_id") || "{}");

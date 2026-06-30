@@ -1,13 +1,14 @@
+export type ColorStatus = "idle" | "gray" | "yellow" | "green" | "notFound";
+
 export interface gridItem {
   letter: string;
-  status: "idle" | "gray" | "yellow" | "green";
+  status: ColorStatus;
 }
 
 export interface LocalStorageItem {
   id: string;
-  score: number;
   winStreak: number;
   activeIndex: number;
   grid: gridItem[][];
-  activeWord: string[];
+  activeWord: string[] | null;
 }
