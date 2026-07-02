@@ -1,6 +1,6 @@
 <script lang="ts">
   type Props = {
-    onPress: () => void;
+    onPress: (keyLetter: string) => void;
     letter: string;
     status?: boolean;
   };
@@ -23,7 +23,7 @@
 </script>
 
 <kbd
-  onclick={onPress}
+  onclick={() => onPress(letter)}
   class={`
   kbd
   cursor-pointer

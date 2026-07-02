@@ -125,6 +125,48 @@
       return;
     }
   };
+
+  const onPress = (keyLetter: string) => {
+  const currentRow = guess[gameStore.value.activeIndex!];
+
+  let targetIndex = currentRow.findIndex((cell) => cell.letter === "");
+
+  if (keyLetter === "BACKSPACE") {
+    console.log(keyLetter);
+    for (let i = 4; i >= 0; i--) {
+      if (currentRow[i].letter !== "") {
+        targetIndex = i;
+        currentRow[targetIndex].letter = "";
+        break;
+      }
+    }
+  }
+
+  if (keyLetter === "ENTER") {
+    onCompleteRow();
+    return;
+  }
+
+  const targetInput = inputs[gameStore.value.activeIndex!][targetIndex];
+
+  if (targetInput) {
+    targetInput.focus();
+
+
+    targetInput.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: keyLetter, 
+        bubbles: true, 
+        cancelable: true,
+      })
+    );
+    
+    if (keyLetter !== "ENTER" && keyLetter !== "BACKSPACE") {
+      targetInput.value = keyLetter.toLowerCase();
+      targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+};
 </script>
 
 <svelte:window onclick={refocus(gameStore.value.activeIndex!, guess, inputs)} />
@@ -188,7 +230,7 @@
         {#each keyboardRows as keyRow, index}
           <div class="flex flex-row justify-center items-center gap-1 m-1">
             {#each keyRow as key}
-              <Key letter={key} onPress={() => console.log(key)} status />
+              <Key letter={key} {onPress} status />
             {/each}
           </div>
         {/each}
